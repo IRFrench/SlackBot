@@ -16,7 +16,7 @@ views = re.compile(r"button_.+")
 
 
 @app.view("outage_modal")
-def handle_view_events(ack, body, logger):
+def handle_view_events(ack, body, logger, client):
     ack()
     logger.info(body)
     from pprint import pprint
@@ -27,21 +27,40 @@ def handle_view_events(ack, body, logger):
     title = body["view"]["state"]["values"]["name"]["title"]["value"]
     print(f"Title: {title}")
 
-    internal_check = body["view"]["state"]["values"]["internal_check"]["select_frame"][
-        "selected_option"
-    ]["value"]
-    print(f"Type: {internal_check}")
+    try:
+        internal_check = body["view"]["state"]["values"]["internal_check"][
+            "select_frame"
+        ]["selected_option"]["value"]
+        print(f"Type: {internal_check}")
+    except TypeError:
+        return
 
     # information is the block, description is the input
     description = body["view"]["state"]["values"]["information"]["description"]["value"]
     print(f"Desc: {description}")
 
     print("Users:")
+    users = []
     for name in body["view"]["state"]["values"]["user_list"]["users"]["selected_users"]:
         print(name)
+        users.append(name)
 
     date = body["view"]["state"]["values"]["date_picker"]["date"]["selected_date"]
     print(f"Date: {date}")
+
+    # Create a channel for the outage
+    response = app.client.conversations_create(
+        name=f"{date}_{title}",
+        is_private=False,
+    )
+
+    channel = response["channel"]["id"]
+
+    user_list = ",".join(users)
+
+    print(user_list)
+
+    app.client.conversations_invite(channel=channel, users=user_list)
 
 
 @app.event("app_mention")
