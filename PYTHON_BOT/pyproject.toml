@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "python-bot"
+version = "0.1.0"
+description = ""
+authors = ["IRFrench <isaacrf@hotmail.co.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.0"
+slack-bolt = "^1.18.0"
+black = "^23.10.1"
+pylint = "^3.0.2"
+mypy = "^1.6.1"
+isort = "^5.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
